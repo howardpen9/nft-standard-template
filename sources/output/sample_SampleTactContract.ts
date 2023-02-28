@@ -1,21 +1,5 @@
-import { 
-    Cell,
-    Slice, 
-    Address, 
-    Builder, 
-    beginCell, 
-    ComputeError, 
-    TupleItem, 
-    TupleReader, 
-    Dictionary, 
-    contractAddress, 
-    ContractProvider, 
-    Sender, 
-    Contract, 
-    ContractABI, 
-    TupleBuilder,
-    DictionaryValue
-} from 'ton-core';
+import { Cell, Slice, Address, Builder, beginCell, ComputeError, TupleItem, TupleReader, Dictionary, contractAddress, ContractProvider, Sender, Contract, ContractABI, TupleBuilder, DictionaryValue } from 'ton-core';
+import { ContractSystem, ContractExecutor } from 'ton-emulator';
 
 export type StateInit = {
     $$type: 'StateInit';
@@ -61,7 +45,6 @@ function dictValueParserStateInit(): DictionaryValue<StateInit> {
         }
     }
 }
-
 export type Context = {
     $$type: 'Context';
     bounced: boolean;
@@ -116,7 +99,6 @@ function dictValueParserContext(): DictionaryValue<Context> {
         }
     }
 }
-
 export type SendParameters = {
     $$type: 'SendParameters';
     bounce: boolean;
@@ -186,7 +168,6 @@ function dictValueParserSendParameters(): DictionaryValue<SendParameters> {
         }
     }
 }
-
 export type Deploy = {
     $$type: 'Deploy';
     queryId: bigint;
@@ -228,7 +209,6 @@ function dictValueParserDeploy(): DictionaryValue<Deploy> {
         }
     }
 }
-
 export type DeployOk = {
     $$type: 'DeployOk';
     queryId: bigint;
@@ -270,7 +250,6 @@ function dictValueParserDeployOk(): DictionaryValue<DeployOk> {
         }
     }
 }
-
 export type Add = {
     $$type: 'Add';
     amount: bigint;
@@ -312,28 +291,31 @@ function dictValueParserAdd(): DictionaryValue<Add> {
         }
     }
 }
-
- type SampleTactContract_init_args = {
-    $$type: 'SampleTactContract_init_args';
-    owner: Address;
-}
-
-function initSampleTactContract_init_args(src: SampleTactContract_init_args) {
-    return (builder: Builder) => {
-        let b_0 = builder;
-        b_0.storeAddress(src.owner);
-    };
-}
-
 async function SampleTactContract_init(owner: Address) {
-    const __code = Cell.fromBase64('te6ccgECDgEAAjAAART/APSkE/S88sgLAQIBYgIDAprQAdDTAwFxsMABkX+RcOIB+kAiUFVvBPhh7UTQ1AH4YtIAAZn6QAEB0x9ZbBKOh/pAAQHR2zziWts8MMj4QgHMfwHKAFlZzxbLH8ntVAwEAgFqCgsD2O2i7ftwIddJwh+VMCDXCx/eApJbf+AhghCH1DrCuo6VMdMfAYIQh9Q6wrry4IHTHwEx2zx/4CGCEJRqmLa6jqMx0x8BghCUapi2uvLggdM/ATHIAYIQr/kPV1jLH8s/yds8f+ABwACRMOMNcAkFBgEk+EFvJBAjXwN/AnCAQlhtbds8BwFc+QGC8MT41yMS7f3vW3vseDO9uxYtFRG9eKkSrtDyY3r2VXKuuo6Gcds8f9sx4AkB9shxAcoBUAcBygBwAcoCUAXPFlAD+gJwAcpoI26zJW6zsY5MfwHKAMhwAcoAcAHKACRus51/AcoABCBu8tCAUATMljQDcAHKAOIkbrOdfwHKAAQgbvLQgFAEzJY0A3ABygDicAHKAAJ/AcoAAslYzJczMwFwAcoA4iFuswgAMJx/AcoAASBu8tCAAcyVMXABygDiyQH7AAAe+EFvJFuBEU0yJMcF8vSgAkW3Qx2omhqAPwxaQAAzP0gAIDpj6y2CUdD/SAAgOjtnnFtnkAwNAHG3ejBOC52Hq6WVz2PQnYc6yVCjbNBOE7rGpaVsj5ZkWnXlv74sRzBOBAq4A3AM7HKZywdVyOS2WHAAAnAAAjE=');
-    const __system = Cell.fromBase64('te6cckECEAEAAjoAAQHAAQEFoebTAgEU/wD0pBP0vPLICwMCAWIIBAIBagYFAHG3ejBOC52Hq6WVz2PQnYc6yVCjbNBOE7rGpaVsj5ZkWnXlv74sRzBOBAq4A3AM7HKZywdVyOS2WHACRbdDHaiaGoA/DFpAADM/SAAgOmPrLYJR0P9IACA6O2ecW2eQDwcAAjECmtAB0NMDAXGwwAGRf5Fw4gH6QCJQVW8E+GHtRNDUAfhi0gABmfpAAQHTH1lsEo6H+kABAdHbPOJa2zwwyPhCAcx/AcoAWVnPFssfye1UDwkD2O2i7ftwIddJwh+VMCDXCx/eApJbf+AhghCH1DrCuo6VMdMfAYIQh9Q6wrry4IHTHwEx2zx/4CGCEJRqmLa6jqMx0x8BghCUapi2uvLggdM/ATHIAYIQr/kPV1jLH8s/yds8f+ABwACRMOMNcA4LCgFc+QGC8MT41yMS7f3vW3vseDO9uxYtFRG9eKkSrtDyY3r2VXKuuo6Gcds8f9sx4A4BJPhBbyQQI18DfwJwgEJYbW3bPAwB9shxAcoBUAcBygBwAcoCUAXPFlAD+gJwAcpoI26zJW6zsY5MfwHKAMhwAcoAcAHKACRus51/AcoABCBu8tCAUATMljQDcAHKAOIkbrOdfwHKAAQgbvLQgFAEzJY0A3ABygDicAHKAAJ/AcoAAslYzJczMwFwAcoA4iFusw0AMJx/AcoAASBu8tCAAcyVMXABygDiyQH7AAAe+EFvJFuBEU0yJMcF8vSgAAJwxW9N9w==');
-    let builder = beginCell();
-    builder.storeRef(__system);
-    builder.storeUint(0, 1);
-    initSampleTactContract_init_args({ $$type: 'SampleTactContract_init_args', owner })(builder);
-    const __data = builder.endCell();
-    return { code: __code, data: __data };
+    const __init = 'te6ccgEBBwEANAABFP8A9KQT9LzyyAsBAgFiAgMCAs0EBQAJoUrd4AkAAdQBEdOAFkZgFtnmTAYAClnPFssf';
+    const __code = 'te6ccgECIwEAAlYAART/APSkE/S88sgLAQIBYgIDAgLLBAUCAWofIAIBIAYHAgFIEBECAdQICQAV/KP4DlAHA4AOUAQElTt+3Ah10nCH5UwINcLH94C0NMDAXGwwAGRf5Fw4gH6QCJQZm8E+GECkVvgIIIQh9Q6wrqPjDDbPALbPDES8BTbPOAgghCUapi2uoCEKDgsACwgbvLQgIAAg0x8BghCH1DrCuvLggdMfAQQij4ww2zwC2zwxEvAW2zzgwAAhDA4NACDTHwGCEJRqmLa68uCB0z8BAnCPMPkBgvDE+NcjEu3971t77HgzvbsWLRURvXipEq7Q8mN69lVyrrqPCNs88BXbPNsx4JEw4vLAgiEOARbI+EIBzFnbPMntVA8AClnPFssfAgEgEhMCASAZGgIBIBQVAgEgFxgB9zIcQHKAVAH8A9wAcoCUAXPFlAD+gJwAcpoI26zJW6zsY49f/APyHDwD3DwDyRus5l/8A8E8AFQBMyVNANw8A/iJG6zmX/wDwTwAVAEzJU0A3DwD+Jw8A8Cf/APAslYzJYzMwFw8A/iIW6zmH/wDwHwAQHMlDFw8A/iyQGAWACU+EFvJBAjXwN/AnCAQlhtbfAQgAAT7AAAfPhBbyRbgRFNMiTHBfL0oIAADDGACASAbHAEJTbPPARgdAAU8BKAABxx8BKABCsgB2zzJHgAWghCv+Q9XWMsfyz8BDbdDG2eeAnAhAE23ejBOC52Hq6WVz2PQnYc6yVCjbNBOE7rGpaVsj5ZkWnXlv74sRzABFu1E0NQB+GLbPGwSIgAO+kABAdMfWQ==';
+    const __system = 'te6cckEBAQEAAwAAAUD20kA0';
+    let systemCell = Cell.fromBase64(__system);
+    let builder = new TupleBuilder();
+    builder.writeCell(systemCell);
+    builder.writeAddress(owner);
+    let __stack = builder.build();
+    let codeCell = Cell.fromBoc(Buffer.from(__code, 'base64'))[0];
+    let initCell = Cell.fromBoc(Buffer.from(__init, 'base64'))[0];
+    let system = await ContractSystem.create();
+    let executor = await ContractExecutor.create({ code: initCell, data: new Cell() }, system);
+    let res = await executor.get('init', __stack);
+    if (!res.success) { throw Error(res.error); }
+    if (res.exitCode !== 0 && res.exitCode !== 1) {
+        if (SampleTactContract_errors[res.exitCode]) {
+            throw new ComputeError(SampleTactContract_errors[res.exitCode].message, res.exitCode, { logs: res.vmLogs });
+        } else {
+            throw new ComputeError('Exit code: ' + res.exitCode, res.exitCode, { logs: res.vmLogs });
+        }
+    }
+    
+    let data = res.stack.readCell();
+    return { code: codeCell, data };
 }
 
 const SampleTactContract_errors: { [key: number]: { message: string } } = {
@@ -358,8 +340,6 @@ const SampleTactContract_errors: { [key: number]: { message: string } } = {
     132: { message: `Access denied` },
     133: { message: `Contract stopped` },
     134: { message: `Invalid argument` },
-    135: { message: `Code of a contract was not found` },
-    136: { message: `Invalid address` },
     4429: { message: `Invalid sender` },
 }
 

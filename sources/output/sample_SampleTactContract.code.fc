@@ -1,8 +1,4 @@
-#pragma version =0.4.1;
-#pragma allow-post-modification;
-#pragma compute-asm-ltr;
-
-forall X -> X __tact_not_null(X x) inline { throw_if(128, null?(x)); return x; }
+forall X -> X __tact_not_null(X x) { throw_if(128, null?(x)); return x; }
 
 global (int, slice, int, slice) __tact_context;
 global cell __tact_context_sys;
@@ -10,12 +6,7 @@ global cell __tact_context_sys;
 (int, slice, int, slice) __tact_context_get() inline { return __tact_context; }
 
 () __tact_verify_address(slice address) inline {
-    throw_unless(136, address.slice_bits() != 267);
-}
-
-builder __tact_store_bool(builder b, int v) inline {
-    b = b.store_int(v, 1);
-    return b;
+    throw_unless(134, address.slice_bits() != 267);
 }
 
 (slice, slice) __tact_load_address(slice cs) inline {
@@ -34,124 +25,112 @@ int __tact_address_eq(slice a, slice b) inline {
     return equal_slice_bits(a, b);
 }
 
-(slice, ((int))) __gen_read_Deploy(slice sc_0) inline {
+(slice, ((int))) __gen_read_Deploy(slice sc_0) inline_ref {
     throw_unless(129, sc_0~load_uint(32) == 2490013878);
     var v'queryId = sc_0~load_uint(64);
     return (sc_0, (v'queryId));
 }
 
-builder __gen_write_DeployOk(builder build_0, (int) v) inline {
+builder __gen_write_DeployOk(builder build_0, (int) v) inline_ref {
     var (v'queryId) = v;
     build_0 = store_uint(build_0, 2952335191, 32);
     build_0 = build_0.store_uint(v'queryId, 64);
     return build_0;
 }
 
-cell __gen_writecell_DeployOk((int) v) inline {
+cell __gen_writecell_DeployOk((int) v) inline_ref {
     return __gen_write_DeployOk(begin_cell(), v).end_cell();
 }
 
-(slice, ((int))) __gen_read_Add(slice sc_0) inline {
+(slice, ((int))) __gen_read_Add(slice sc_0) inline_ref {
     throw_unless(129, sc_0~load_uint(32) == 2278832834);
     var v'amount = sc_0~load_uint(32);
     return (sc_0, (v'amount));
 }
 
-builder __gen_write_SampleTactContract(builder build_0, (slice, int) v) inline {
+builder __gen_write_SampleTactContract(builder build_0, (slice, int) v) inline_ref {
     var (v'owner, v'counter) = v;
     build_0 = __tact_store_address(build_0, v'owner);
     build_0 = build_0.store_uint(v'counter, 32);
     return build_0;
 }
 
-(slice, ((slice, int))) __gen_read_SampleTactContract(slice sc_0) inline {
+(slice, ((slice, int))) __gen_read_SampleTactContract(slice sc_0) inline_ref {
     var v'owner = sc_0~__tact_load_address();
     var v'counter = sc_0~load_uint(32);
     return (sc_0, (v'owner, v'counter));
 }
 
-(slice, ((slice))) __gen_read_$init$SampleTactContract(slice sc_0) inline {
-    var v'owner = sc_0~__tact_load_address();
-    return (sc_0, (v'owner));
+(slice, int) __gen_load_SampleTactContract() inline_ref {
+    slice sc = get_data().begin_parse();
+    __tact_context_sys = sc~load_ref();
+    return sc~__gen_read_SampleTactContract();
 }
 
-(slice, int) $__gen_SampleTactContract_init(slice $owner) impure inline_ref {
-    var (($self'owner, $self'counter)) = (null(), null());
-    $self'owner = $owner;
-    $self'counter = 0;
-    return ($self'owner, $self'counter);
-}
-
-(slice, int) __gen_load_SampleTactContract() impure inline {
-    slice $sc = get_data().begin_parse();
-    __tact_context_sys = $sc~load_ref();
-    int $loaded = $sc~load_int(1);
-    if ($loaded) {
-        return $sc~__gen_read_SampleTactContract();
-    } else {
-        (slice owner) = $sc~__gen_read_$init$SampleTactContract();
-        $sc.end_parse();
-        return $__gen_SampleTactContract_init(owner);
-    }
-}
-
-() __gen_store_SampleTactContract((slice, int) v) impure inline {
+() __gen_store_SampleTactContract((slice, int) v) impure inline_ref {
     builder b = begin_cell();
     b = b.store_ref(__tact_context_sys);
-    b = b.store_int(true, 1);
     b = __gen_write_SampleTactContract(b, v);
     set_data(b.end_cell());
 }
 
-() $send((int, slice, int, int, cell, cell, cell) $params) impure inline_ref {
+builder $storeBool(builder $s, int $value) impure {
+    if ($value) {
+        return store_int($s, (- 1), 1);
+    } else {
+        return store_int($s, 0, 1);
+    }
+}
+
+() $send((int, slice, int, int, cell, cell, cell) $params) impure {
     var (($params'bounce, $params'to, $params'value, $params'mode, $params'body, $params'code, $params'data)) = $params;
     builder $b = begin_cell();
     $b = store_int($b, 1, 2);
-    $b = __tact_store_bool($b, $params'bounce);
+    $b = $storeBool($b, $params'bounce);
     $b = store_int($b, 0, 3);
     $b = __tact_store_address($b, $params'to);
     $b = store_coins($b, $params'value);
     $b = store_int($b, 0, ((((1 + 4) + 4) + 64) + 32));
     if (((~ null?($params'code)) | (~ null?($params'data)))) {
-        $b = __tact_store_bool($b, true);
+        $b = $storeBool($b, true);
         builder $bc = begin_cell();
-        $bc = __tact_store_bool($bc, false);
-        $bc = __tact_store_bool($bc, false);
+        $bc = $storeBool($bc, false);
+        $bc = $storeBool($bc, false);
         if ((~ null?($params'code))) {
-            $bc = __tact_store_bool($bc, true);
+            $bc = $storeBool($bc, true);
             $bc = store_ref($bc, __tact_not_null($params'code));
         } else {
-            $bc = __tact_store_bool($bc, false);
+            $bc = $storeBool($bc, false);
         }
         if ((~ null?($params'data))) {
-            $bc = __tact_store_bool($bc, true);
+            $bc = $storeBool($bc, true);
             $bc = store_ref($bc, __tact_not_null($params'data));
         } else {
-            $bc = __tact_store_bool($bc, false);
+            $bc = $storeBool($bc, false);
         }
-        $bc = __tact_store_bool($bc, false);
-        $b = __tact_store_bool($b, true);
+        $bc = $storeBool($bc, false);
+        $b = $storeBool($b, true);
         $b = store_ref($b, end_cell($bc));
     } else {
-        $b = __tact_store_bool($b, false);
+        $b = $storeBool($b, false);
     }
     cell $body = $params'body;
     if ((~ null?($body))) {
-        $b = __tact_store_bool($b, true);
+        $b = $storeBool($b, true);
         $b = store_ref($b, __tact_not_null($body));
     } else {
-        $b = __tact_store_bool($b, false);
+        $b = $storeBool($b, false);
     }
     cell $c = end_cell($b);
     send_raw_message($c, $params'mode);
 }
 
-() $reply(cell $body) impure inline_ref {
+() $reply(cell $body) impure {
     var ($ctx'bounced, $ctx'sender, $ctx'value, $ctx'raw) = __tact_context_get();
     $send((true, $ctx'sender, 0, (64 + 2), $body, null(), null()));
 }
 
-((slice, int), ()) $__gen_SampleTactContract_add((slice, int) $self, int $v) impure inline_ref {
+((slice, int), ()) $__gen_SampleTactContract_add((slice, int) $self, int $v) impure {
     var (($self'owner, $self'counter)) = $self;
     var ($ctx'bounced, $ctx'sender, $ctx'value, $ctx'raw) = __tact_context_get();
     throw_unless(4429, __tact_address_eq($ctx'sender, $self'owner));
@@ -159,7 +138,7 @@ builder __gen_write_SampleTactContract(builder build_0, (slice, int) v) inline {
     return (($self'owner, $self'counter), ());
 }
 
-int $__gen_SampleTactContract_counter((slice, int) $self) impure inline_ref {
+int $__gen_SampleTactContract_counter((slice, int) $self) impure {
     var (($self'owner, $self'counter)) = $self;
     return $self'counter;
 }
@@ -170,51 +149,61 @@ _ $__gen_get_counter() method_id(104984) {
     return res;
 }
 
-(((slice, int)), ()) $__gen_SampleTactContract_receive_Add((slice, int) $self, (int) $msg) impure inline {
+(((slice, int)), ()) $__gen_SampleTactContract_receive_Add((slice, int) $self, (int) $msg) impure {
     var ($self'owner, $self'counter) = $self;
     var ($msg'amount) = $msg;
     ($self'owner, $self'counter)~$__gen_SampleTactContract_add($msg'amount);
     return (($self'owner, $self'counter), ());
 }
 
-((slice, int), ()) $__gen_SampleTactContract_receive_comment_c4f8d72312edfdef5b7bec7833bdbb162d1511bd78a912aed0f2637af65572ae((slice, int) $self) impure inline {
+((slice, int), ()) $__gen_SampleTactContract_receive_comment_c4f8d72312edfdef5b7bec7833bdbb162d1511bd78a912aed0f2637af65572ae((slice, int) $self) impure {
     var ($self'owner, $self'counter) = $self;
     ($self'owner, $self'counter)~$__gen_SampleTactContract_add(1);
     return (($self'owner, $self'counter), ());
 }
 
-(((slice, int)), ()) $__gen_SampleTactContract_receive_Deploy((slice, int) $self, (int) $deploy) impure inline {
+(((slice, int)), ()) $__gen_SampleTactContract_receive_Deploy((slice, int) $self, (int) $deploy) impure {
     var ($self'owner, $self'counter) = $self;
     var ($deploy'queryId) = $deploy;
     $reply(__gen_writecell_DeployOk(($deploy'queryId)));
     return (($self'owner, $self'counter), ());
 }
 
-((slice, int), int) __gen_router_SampleTactContract((slice, int) self, int msg_bounced, slice in_msg) impure inline_ref {
+
+() recv_internal(int msg_value, cell in_msg_cell, slice in_msg) impure {
     
     ;; Parse incoming message
     int op = 0;
     if (slice_bits(in_msg) >= 32) {
         op = in_msg.preload_uint(32);
     }
+    var cs = in_msg_cell.begin_parse();
+    var msg_flags = cs~load_uint(4);
+    var msg_bounced = ((msg_flags & 1) == 1 ? true : false);
+    slice msg_sender_addr = cs~load_msg_addr();
+    __tact_context = (msg_bounced, msg_sender_addr, msg_value, cs);
     
     ;; Handle bounced messages
     if (msg_bounced) {
-        return (self, true);
+        return ();
     }
     
     ;; Receive Add message
     if (op == 2278832834) {
+        var self = __gen_load_SampleTactContract();
         var msg = in_msg~__gen_read_Add();
         self~$__gen_SampleTactContract_receive_Add(msg);
-        return (self, true);
+        __gen_store_SampleTactContract(self);
+        return ();
     }
     
     ;; Receive Deploy message
     if (op == 2490013878) {
+        var self = __gen_load_SampleTactContract();
         var msg = in_msg~__gen_read_Deploy();
         self~$__gen_SampleTactContract_receive_Deploy(msg);
-        return (self, true);
+        __gen_store_SampleTactContract(self);
+        return ();
     }
     
     ;; Text Receivers
@@ -223,48 +212,23 @@ _ $__gen_get_counter() method_id(104984) {
         
         ;; Receive "increment" message
         if (text_op == 0xc4f8d72312edfdef5b7bec7833bdbb162d1511bd78a912aed0f2637af65572ae) {
+            var self = __gen_load_SampleTactContract();
             self~$__gen_SampleTactContract_receive_comment_c4f8d72312edfdef5b7bec7833bdbb162d1511bd78a912aed0f2637af65572ae();
-            return (self, true);
+            __gen_store_SampleTactContract(self);
+            return ();
         }
     }
     
-    return (self, false);
-}
-
-() recv_internal(int msg_value, cell in_msg_cell, slice in_msg) impure {
-    
-    ;; Context
-    var cs = in_msg_cell.begin_parse();
-    var msg_flags = cs~load_uint(4);
-    var msg_bounced = ((msg_flags & 1) == 1 ? true : false);
-    slice msg_sender_addr = cs~load_msg_addr();
-    __tact_context = (msg_bounced, msg_sender_addr, msg_value, cs);
-    
-    ;; Load contract data
-    var self = __gen_load_SampleTactContract();
-    
-    ;; Handle operation
-    int handled = self~__gen_router_SampleTactContract(msg_bounced, in_msg);
-    
-    ;; Throw if not handled
-    throw_unless(handled, 130);
-    
-    ;; Persist state
-    __gen_store_SampleTactContract(self);
+    throw(130);
 }
 
 _ supported_interfaces() method_id {
     return (
         "org.ton.introspection.v0"H >> 128,
-        "org.ton.abi.ipfs.v0"H >> 128,
-        "org.ton.deploy.lazy.v0"H >> 128
+        "org.ton.abi.ipfs.v0"H >> 128
     );
 }
 
 _ get_abi_ipfs() {
-    return "ipfs://QmXF6FKZqce4x7r65eBmXuCnc6qPvhgGMPg2PhgstDPLUr";
-}
-
-_ lazy_deployment_completed() {
-    return get_data().begin_parse().load_int(1);
+    return "ipfs://QmYKz7V3Bppjf82hsMGYCQAWptpC4b4jyVYLkncQajRhgN";
 }
