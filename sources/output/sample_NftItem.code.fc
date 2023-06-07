@@ -8,7 +8,7 @@ int __tact_my_balance() inline {
     return pair_first(get_balance());
 }
 
-forall X -> X __tact_not_null(X x) { throw_if(128, null?(x)); return x; }
+forall X -> X __tact_not_null(X x) inline { throw_if(128, null?(x)); return x; }
 
 global (int, slice, int, slice) __tact_context;
 global cell __tact_context_sys;
@@ -182,7 +182,7 @@ builder __gen_write_OwnershipAssigned(builder build_0, (int, slice, slice) v) in
     return build_0;
 }
 
-cell __gen_writecell_OwnershipAssigned((int, slice, slice) v) inline_ref {
+cell __gen_writecell_OwnershipAssigned((int, slice, slice) v) inline {
     return __gen_write_OwnershipAssigned(begin_cell(), v).end_cell();
 }
 
@@ -193,7 +193,7 @@ builder __gen_write_Excesses(builder build_0, (int) v) inline {
     return build_0;
 }
 
-cell __gen_writecell_Excesses((int) v) inline_ref {
+cell __gen_writecell_Excesses((int) v) inline {
     return __gen_write_Excesses(begin_cell(), v).end_cell();
 }
 
@@ -212,7 +212,7 @@ builder __gen_write_ReportStaticData(builder build_0, (int, int, slice) v) inlin
     return build_0;
 }
 
-cell __gen_writecell_ReportStaticData((int, int, slice) v) inline_ref {
+cell __gen_writecell_ReportStaticData((int, int, slice) v) inline {
     return __gen_write_ReportStaticData(begin_cell(), v).end_cell();
 }
 
@@ -240,15 +240,50 @@ builder __gen_write_NftItem(builder build_0, (slice, int, slice, cell, int) v) i
     return (v'is_initialized, v'index, v'collection_address, v'owner_address, v'individual_content);
 }
 
-(slice, int, slice, cell, int) __gen_load_NftItem() inline {
-    slice sc = get_data().begin_parse();
-    __tact_context_sys = sc~load_ref();
-    return sc~__gen_read_NftItem();
+builder __gen_write_$init$NftItem(builder build_0, (slice, int, slice, cell) v) inline {
+    var (v'collection_address, v'item_index, v'owner, v'individual_content) = v;
+    build_0 = __tact_store_address(build_0, v'collection_address);
+    build_0 = build_0.store_int(v'item_index, 257);
+    build_0 = __tact_store_address(build_0, v'owner);
+    build_0 = build_0.store_ref(v'individual_content);
+    return build_0;
+}
+
+(slice, ((slice, int, slice, cell))) __gen_read_$init$NftItem(slice sc_0) inline {
+    var v'collection_address = sc_0~__tact_load_address();
+    var v'item_index = sc_0~load_int(257);
+    var v'owner = sc_0~__tact_load_address();
+    var v'individual_content = sc_0~load_ref();
+    return (sc_0, (v'collection_address, v'item_index, v'owner, v'individual_content));
+}
+
+(slice, int, slice, cell, int) $__gen_NftItem_init(slice $collection_address, int $item_index, slice $owner, cell $individual_content) impure inline_ref {
+    var (($self'collection_address, $self'item_index, $self'owner, $self'individual_content, $self'is_initialized)) = (null(), null(), null(), null(), null());
+    $self'collection_address = $collection_address;
+    $self'item_index = $item_index;
+    $self'owner = $owner;
+    $self'individual_content = $individual_content;
+    $self'is_initialized = false;
+    return ($self'collection_address, $self'item_index, $self'owner, $self'individual_content, $self'is_initialized);
+}
+
+(slice, int, slice, cell, int) __gen_load_NftItem() impure inline {
+    slice $sc = get_data().begin_parse();
+    __tact_context_sys = $sc~load_ref();
+    int $loaded = $sc~load_int(1);
+    if ($loaded) {
+        return $sc~__gen_read_NftItem();
+    } else {
+        (slice collection_address, int item_index, slice owner, cell individual_content) = $sc~__gen_read_$init$NftItem();
+        $sc.end_parse();
+        return $__gen_NftItem_init(collection_address, item_index, owner, individual_content);
+    }
 }
 
 () __gen_store_NftItem((slice, int, slice, cell, int) v) impure inline {
     builder b = begin_cell();
     b = b.store_ref(__tact_context_sys);
+    b = b.store_int(true, 1);
     b = __gen_write_NftItem(b, v);
     set_data(b.end_cell());
 }
@@ -319,17 +354,8 @@ int $__gen_Context_readForwardFee((int, slice, int, slice) $self) impure inline_
     return (($sc~load_coins() * 3) / 2);
 }
 
-cell $__gen_NftItem_init(cell sys', slice $collection_address, int $item_index, slice $owner, cell $individual_content) {
-    var (($self'collection_address, $self'item_index, $self'owner, $self'individual_content, $self'is_initialized)) = (null(), null(), null(), null(), null());
-    $self'collection_address = $collection_address;
-    $self'item_index = $item_index;
-    $self'owner = $owner;
-    $self'individual_content = $individual_content;
-    $self'is_initialized = false;
-    var b' = begin_cell();
-    b' = b'.store_ref(sys');
-    b' = __gen_write_NftItem(b', ($self'collection_address, $self'item_index, $self'owner, $self'individual_content, $self'is_initialized));
-    return b'.end_cell();
+((int, slice, int, int, cell, cell, cell)) __gen_constructor_SendParameters$to_value_mode_bounce_body(slice to, int value, int mode, int bounce, cell body) inline {
+    return (bounce, to, value, mode, body, null(), null());
 }
 
 (cell, cell) $__gen_NftItem_init_child(cell sys', slice $collection_address, int $item_index, slice $owner, cell $individual_content) {
@@ -340,8 +366,17 @@ cell $__gen_NftItem_init(cell sys', slice $collection_address, int $item_index, 
     ;; Contract Code: NftItem
     cell mine = __tact_dict_get_code(source, 31210);
     contracts = __tact_dict_set_code(contracts, 31210, mine);
-    cell sys = begin_cell().store_dict(contracts).end_cell();
-    return (mine, $__gen_NftItem_init(sys, $collection_address, $item_index, $owner, $individual_content));
+    
+    ;; Build cell
+    builder b = begin_cell();
+    b = b.store_ref(begin_cell().store_dict(contracts).end_cell());
+    b = b.store_int(false, 1);
+    b = __gen_write_$init$NftItem(b, ($collection_address, $item_index, $owner, $individual_content));
+    return (mine, b.end_cell());
+}
+
+((int, int, slice, slice, cell)) __gen_constructor_GetNftData$is_initialized_index_collection_address_owner_address_individual_content(int is_initialized, int index, slice collection_address, slice owner_address, cell individual_content) inline {
+    return (is_initialized, index, collection_address, owner_address, individual_content);
 }
 
 (int, int, slice, slice, cell) $__gen_NftItem_get_nft_data((slice, int, slice, cell, int) $self) impure inline_ref {
@@ -351,13 +386,25 @@ cell $__gen_NftItem_init(cell sys', slice $collection_address, int $item_index, 
     $b~__tact_string_builder_append($collectionData);
     $b~__tact_string_builder_append(__tact_int_to_string($self'item_index));
     $b~__tact_string_builder_append(__gen_str_303397552());
-    return ($self'is_initialized, $self'item_index, $self'collection_address, $self'owner, __tact_string_builder_end($b));
+    return __gen_constructor_GetNftData$is_initialized_index_collection_address_owner_address_individual_content($self'is_initialized, $self'item_index, $self'collection_address, $self'owner, __tact_string_builder_end($b));
 }
 
 _ $__gen_get_get_nft_data() method_id(102351) {
     var self = __gen_load_NftItem();
     var res = $__gen_NftItem_get_nft_data(self);
     return __gen_GetNftData_to_external(res);
+}
+
+((int, slice, int, int, cell, cell, cell)) __gen_constructor_SendParameters$to_value_mode_body(slice to, int value, int mode, cell body) inline {
+    return (true, to, value, mode, body, null(), null());
+}
+
+((int)) __gen_constructor_Excesses$query_id(int query_id) inline {
+    return (query_id);
+}
+
+((int, slice, slice)) __gen_constructor_OwnershipAssigned$query_id_prev_owner_forward_payload(int query_id, slice prev_owner, slice forward_payload) inline {
+    return (query_id, prev_owner, forward_payload);
 }
 
 (((slice, int, slice, cell, int)), ()) $__gen_NftItem_receive_Transfer((slice, int, slice, cell, int) $self, (int, slice, slice, cell, int, slice) $msg) impure inline {
@@ -371,21 +418,28 @@ _ $__gen_get_get_nft_data() method_id(102351) {
     if (($self'is_initialized == false)) {
         $self'is_initialized = true;
         $self'owner = $msg'new_owner;
-        $send((true, $msg'response_destination, 0, (2 + 64), __gen_writecell_Excesses(($msg'query_id)), null(), null()));
+        $send(__gen_constructor_SendParameters$to_value_mode_body($msg'response_destination, 50000000, 2, __gen_writecell_Excesses(__gen_constructor_Excesses$query_id($msg'query_id))));
     } else {
         int $fwdFee = $__gen_Context_readForwardFee(($ctx'bounced, $ctx'sender, $ctx'value, $ctx'raw));
         $msgValue = ($msgValue - $fwdFee);
         if ((($msg'forward_amount == 0) | null?($msg'forward_amount))) {
-            $self'owner = $msg'new_owner;
-            $send((true, $msg'response_destination, $msgValue, 2, __gen_writecell_Excesses(($msg'query_id)), null(), null()));
+            $send(__gen_constructor_SendParameters$to_value_mode_body($msg'response_destination, 50000000, 2, __gen_writecell_Excesses(__gen_constructor_Excesses$query_id($msg'query_id))));
             $self'owner = $msg'new_owner;
         } elseif (($msg'forward_amount > 0)) {
-            $send((false, $msg'new_owner, $msg'forward_amount, 2, __gen_writecell_OwnershipAssigned(($msg'query_id, $self'owner, $msg'forward_payload)), null(), null()));
+            $send(__gen_constructor_SendParameters$to_value_mode_bounce_body($msg'new_owner, $msg'forward_amount, 2, false, __gen_writecell_OwnershipAssigned(__gen_constructor_OwnershipAssigned$query_id_prev_owner_forward_payload($msg'query_id, $self'owner, $msg'forward_payload))));
             $self'owner = $msg'new_owner;
-            $send((true, $msg'response_destination, 0, (2 + 64), __gen_writecell_Excesses(($msg'query_id)), null(), null()));
+            $send(__gen_constructor_SendParameters$to_value_mode_body($msg'response_destination, 50000000, 0, __gen_writecell_Excesses(__gen_constructor_Excesses$query_id($msg'query_id))));
         }
     }
     return (($self'collection_address, $self'item_index, $self'owner, $self'individual_content, $self'is_initialized), ());
+}
+
+((int, slice, int, int, cell, cell, cell)) __gen_constructor_SendParameters$to_value_mode_bounce_body_code_data(slice to, int value, int mode, int bounce, cell body, cell code, cell data) inline {
+    return (bounce, to, value, mode, body, code, data);
+}
+
+((int, int, slice)) __gen_constructor_ReportStaticData$query_id_index_id_collection(int query_id, int index_id, slice collection) inline {
+    return (query_id, index_id, collection);
 }
 
 (((slice, int, slice, cell, int)), ()) $__gen_NftItem_receive_GetStaticData((slice, int, slice, cell, int) $self, (int) $msg) impure inline {
@@ -393,57 +447,74 @@ _ $__gen_get_get_nft_data() method_id(102351) {
     var ($msg'query_id) = $msg;
     var ($nft_init'code, $nft_init'data) = $__gen_NftItem_init_child(__tact_context_sys, $self'collection_address, $self'item_index, $self'owner, $self'individual_content);
     slice $itemAddress = $contractAddress(($nft_init'code, $nft_init'data));
-    $send((true, $itemAddress, 0, 64, __gen_writecell_ReportStaticData(($msg'query_id, $self'item_index, $self'owner)), $nft_init'code, $nft_init'data));
+    $send(__gen_constructor_SendParameters$to_value_mode_bounce_body_code_data($itemAddress, 0, 64, true, __gen_writecell_ReportStaticData(__gen_constructor_ReportStaticData$query_id_index_id_collection($msg'query_id, $self'item_index, $self'owner)), $nft_init'code, $nft_init'data));
     return (($self'collection_address, $self'item_index, $self'owner, $self'individual_content, $self'is_initialized), ());
 }
 
-
-() recv_internal(int msg_value, cell in_msg_cell, slice in_msg) impure {
+((slice, int, slice, cell, int), int) __gen_router_NftItem((slice, int, slice, cell, int) self, int msg_bounced, slice in_msg) impure inline_ref {
     
     ;; Parse incoming message
     int op = 0;
     if (slice_bits(in_msg) >= 32) {
         op = in_msg.preload_uint(32);
     }
+    
+    ;; Handle bounced messages
+    if (msg_bounced) {
+        return (self, true);
+    }
+    
+    ;; Receive Transfer message
+    if (op == 1607220500) {
+        var msg = in_msg~__gen_read_Transfer();
+        self~$__gen_NftItem_receive_Transfer(msg);
+        return (self, true);
+    }
+    
+    ;; Receive GetStaticData message
+    if (op == 801842850) {
+        var msg = in_msg~__gen_read_GetStaticData();
+        self~$__gen_NftItem_receive_GetStaticData(msg);
+        return (self, true);
+    }
+    
+    return (self, false);
+}
+
+() recv_internal(int msg_value, cell in_msg_cell, slice in_msg) impure {
+    
+    ;; Context
     var cs = in_msg_cell.begin_parse();
     var msg_flags = cs~load_uint(4);
     var msg_bounced = ((msg_flags & 1) == 1 ? true : false);
     slice msg_sender_addr = cs~load_msg_addr();
     __tact_context = (msg_bounced, msg_sender_addr, msg_value, cs);
     
-    ;; Handle bounced messages
-    if (msg_bounced) {
-        return ();
-    }
+    ;; Load contract data
+    var self = __gen_load_NftItem();
     
-    ;; Receive Transfer message
-    if (op == 1607220500) {
-        var self = __gen_load_NftItem();
-        var msg = in_msg~__gen_read_Transfer();
-        self~$__gen_NftItem_receive_Transfer(msg);
-        __gen_store_NftItem(self);
-        return ();
-    }
+    ;; Handle operation
+    int handled = self~__gen_router_NftItem(msg_bounced, in_msg);
     
-    ;; Receive GetStaticData message
-    if (op == 801842850) {
-        var self = __gen_load_NftItem();
-        var msg = in_msg~__gen_read_GetStaticData();
-        self~$__gen_NftItem_receive_GetStaticData(msg);
-        __gen_store_NftItem(self);
-        return ();
-    }
+    ;; Throw if not handled
+    throw_unless(handled, 130);
     
-    throw(130);
+    ;; Persist state
+    __gen_store_NftItem(self);
 }
 
 _ supported_interfaces() method_id {
     return (
         "org.ton.introspection.v0"H >> 128,
-        "org.ton.abi.ipfs.v0"H >> 128
+        "org.ton.abi.ipfs.v0"H >> 128,
+        "org.ton.deploy.lazy.v0"H >> 128
     );
 }
 
 _ get_abi_ipfs() {
     return "ipfs://QmcRe4cZUD6kBe1cQsobphEaA83yWiC6GcCu53kjBuaaED";
+}
+
+_ lazy_deployment_completed() {
+    return get_data().begin_parse().load_int(1);
 }

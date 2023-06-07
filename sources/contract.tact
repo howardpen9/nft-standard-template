@@ -1,4 +1,3 @@
-
 struct CollectionData {
     next_item_index: Int;
     collection_content: Cell;
@@ -29,11 +28,7 @@ contract NftCollection {
     royalty_params: RoyaltyParams;                      
     collection_content: Cell;   
 
-    init(
-        owner_address: Address, 
-        collection_content: Cell, 
-        royalty_params: RoyaltyParams
-    ){
+    init(owner_address: Address, collection_content: Cell, royalty_params: RoyaltyParams){
         self.owner_address = owner_address;
         self.collection_content = collection_content; 
         self.royalty_params = royalty_params;
@@ -41,6 +36,7 @@ contract NftCollection {
 
     receive("Mint"){
         let ctx: Context = context(); // get sender Info
+
         let msgValue: Int = ctx.value;
         let tonBalanceBeforeMsg: Int = myBalance() - msgValue;
         let storageFee: Int = self.minTonsForStorage - min(tonBalanceBeforeMsg, self.minTonsForStorage);
@@ -48,9 +44,9 @@ contract NftCollection {
 
         self.mint(ctx.sender, msgValue);
     }
+
     // ===== Private Methods ===== //
     fun mint(sender: Address, msgValue: Int) {
-        // TODO: if (is_initialized == false) { // next_item_index == -1 }
         require(self.next_item_index >= 0, "non-sequential NFTs");
 
         let nft_init: StateInit = self.getNftItemInit(self.next_item_index);
@@ -59,6 +55,8 @@ contract NftCollection {
                 value: msgValue, 
                 bounce: false,
                 mode: SendIgnoreErrors,
+                code: nft_init.code,
+                data: nft_init.data,
                 body: Transfer{
                     query_id: 0,
                     new_owner: sender,
@@ -67,8 +65,6 @@ contract NftCollection {
                     forward_amount: 0,
                     forward_payload: emptySlice()
                 }.toCell(),
-                code: nft_init.code,
-                data: nft_init.data
             });
         self.next_item_index = self.next_item_index + 1;
     }
@@ -87,7 +83,6 @@ contract NftCollection {
                 }.toCell()
         });        
     }
-
 
     // ------------------ Get Function  ------------------ //
     get fun get_collection_data(): CollectionData{     
@@ -124,7 +119,6 @@ contract NftCollection {
 }
 
 // ---------------------------------------------------------------------------------------------------- //
-
 contract NftItem {
     const minTonsForStorage: Int = ton("0.05");
     const gasConsumption: Int = ton("0.05");
@@ -159,11 +153,11 @@ contract NftItem {
             self.owner = msg.new_owner;
             send(SendParameters{
                 to: msg.response_destination,
-                value: 0,
-                mode:  SendIgnoreErrors + SendRemainingValue,
-                body: Excesses { //0xd53276db
-                        query_id: msg.query_id
-                    }.toCell()
+                value: ton("0.05"),
+                mode: SendIgnoreErrors,
+                // value: 0,
+                // mode:  SendIgnoreErrors + SendRemainingValue,
+                body: Excesses { query_id: msg.query_id }.toCell() //0xd53276db
                 });
         } else {
             let fwdFee: Int = ctx.readForwardFee();
@@ -171,11 +165,10 @@ contract NftItem {
             if (msg.forward_amount == 0 || msg.forward_amount == null) { 
                 send(SendParameters{ // 0xd53276db
                     to: msg.response_destination,
+                    value: ton("0.05"),
                     mode: SendIgnoreErrors,
-                    value: msgValue,
-                    body: Excesses {
-                        query_id: msg.query_id
-                    }.toCell()
+                    // value: msgValue,
+                    body: Excesses { query_id: msg.query_id }.toCell()
                 });
                 self.owner = msg.new_owner; // change current owner to the new_owner
             } else if (msg.forward_amount > 0) { //  msg: forward_amount => the amount of nano-tons to be sent to the new owner.
@@ -190,14 +183,15 @@ contract NftItem {
                         forward_payload: msg.forward_payload
                     }.toCell()
                 }); 
+
                 self.owner = msg.new_owner; // change current owner to the new_owner
                 send(SendParameters{ // 0xd53276db
                     to: msg.response_destination,
-                    value: 0,
-                    mode: SendIgnoreErrors + SendRemainingValue,
-                    body: Excesses {
-                        query_id: msg.query_id
-                    }.toCell()
+                    value: ton("0.05"),
+                    mode: 0,
+                    // value: 0,
+                    // mode: SendIgnoreErrors + SendRemainingValue,
+                    body: Excesses { query_id: msg.query_id }.toCell()
                 });
             }
         }
@@ -244,6 +238,7 @@ contract NftItem {
         };
     }
 }
+
 // ---------------------------------------------------------------------------------------------------- //
 // [Collection Contract] -> Transfer -> OwnershipAssigned -> NFTExcesses
 message(0x5fcc3d14) Transfer { 
@@ -270,7 +265,6 @@ message(0x8b771735) ReportStaticData{
     index_id: Int;
     collection: Address;
 }
-// -------------------------------- Customized Message -------------------------------- //
 
 struct GetNftData { 
     is_initialized: Bool;
